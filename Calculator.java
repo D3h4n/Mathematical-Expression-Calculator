@@ -8,7 +8,7 @@ public class Calculator {
     String input = stdin.nextLine();
     
     while (input.compareTo("end") != 0) {
-      double result = parseExpression(input);
+      double result = calculateExpression(input);
       System.out.println("Result: " + result + "\n");
       
       System.out.print("Enter an expression: ");
@@ -18,7 +18,7 @@ public class Calculator {
     stdin.close(); // close scanner
   }
 
-  static double parseExpression(String expression) {
+  static double calculateExpression(String expression) {
     final String[] operations = {"-", "+", "*", "/", "^"};
     String[] operands;
     String operation = "";
@@ -39,19 +39,19 @@ public class Calculator {
 
       switch(operation) {
         case "-":
-          return parseExpression(operands[0]) - parseExpression(operands[1]);
+          return calculateExpression(operands[0]) - calculateExpression(operands[1]);
 
         case "+":
-          return parseExpression(operands[0]) + parseExpression(operands[1]);
+          return calculateExpression(operands[0]) + calculateExpression(operands[1]);
 
         case "*":
-          return parseExpression(operands[0]) * parseExpression(operands[1]);
+          return calculateExpression(operands[0]) * calculateExpression(operands[1]);
 
         case "/":
-          return parseExpression(operands[0]) / parseExpression(operands[1]);
+          return calculateExpression(operands[0]) / calculateExpression(operands[1]);
         
         case "^":
-          return Math.pow(parseExpression(operands[0]),  parseExpression(operands[1]));
+          return Math.pow(calculateExpression(operands[0]),  calculateExpression(operands[1]));
       }
 
       return Integer.MAX_VALUE;
