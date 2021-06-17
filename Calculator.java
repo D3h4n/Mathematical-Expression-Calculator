@@ -10,8 +10,8 @@ public class Calculator {
     
     while (!input.isBlank()) { // loop while user inputs an expression
       double result = calculateExpression(input); // calculate value of expression
-      System.out.println("Result: " + result + "\n"); // output value
-      
+      System.out.println("Result: " + result); // output value
+    
       // get user input
       System.out.print("Enter an expression:(end) ");
       input = stdin.nextLine();
@@ -38,40 +38,8 @@ public class Calculator {
       return 0;
     }
 
-    // Calculate value of subexpression in parentheses
-    int start = expression.indexOf("("); // find the index of open parenthesis
-    
-    while (start != -1) {
-      char[] arr = expression.toCharArray(); // convert string to character array
-      int parenthesesCount = 1;
-      int end = start + 1;
-      
-      // find related close parenthesis
-      for (; parenthesesCount != 0; end++) {
-        // exit program if invalid number of parentheses
-        if (end == arr.length) {
-          System.exit(2);
-        }
-        
-        if (arr[end] == '(') {
-          parenthesesCount++;
-        } else if (arr[end] == ')') {
-          parenthesesCount--;
-        }
-      }
-
-      // extract subexpression
-      String subexpression = expression.substring(start + 1, end - 1);
-      
-      // calculate value of subexpression
-      double value = calculateExpression(subexpression);
-      
-      // replace subexpression with value
-      expression = expression.substring(0, start) + String.valueOf(value) + expression.substring(end);
-
-      // find next subexpression
-      start = expression.indexOf("(");
-    }
+    // Calculate value of subexpressions in parentheses
+    expression = calculateSubexpressions(expression);
 
     // iterate to find operand with most precendence in expression
     for (String opp: operations) {
@@ -110,6 +78,50 @@ public class Calculator {
     }
   }
   
+  static String calculateSubexpressions(String expression) {
+    int start = expression.indexOf("("); // find the index of open parenthesis
+    
+    while (start != -1) {
+      // find related close parenthesis
+      int end = findCloseParenthesis(expression, start);
+
+      // extract subexpression
+      String subexpression = expression.substring(start + 1, end - 1);
+      
+      // calculate value of subexpression
+      double value = calculateExpression(subexpression);
+      
+      // replace subexpression with value
+      expression = expression.replace(String.format("(%s)", subexpression), String.valueOf(value));
+
+      // find next subexpression
+      start = expression.indexOf("(");
+    }
+
+    return expression;
+  }
+
+  static int findCloseParenthesis(String expression, int start) {
+    int length = expression.length();
+    int parenthesesCount = 1;
+    int end = start + 1;
+    
+    for (; parenthesesCount != 0; end++) {
+      // exit program if invalid number of parentheses
+      if (end == length) {
+        System.exit(2);
+      }
+      
+      if (expression.charAt(end) == '(') {
+        parenthesesCount++;
+      } else if (expression.charAt(end) == ')') {
+        parenthesesCount--;
+      }
+    }
+
+    return end;
+  }
+
   /**
    * Split the operands of a binary operator 
    * 
