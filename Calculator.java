@@ -78,48 +78,62 @@ public class Calculator {
     }
   }
   
+  /**
+   * Replace Subexpression in parentheses with their value
+   * 
+   * @param expression
+   * @return resulting expression
+   */
+
   static String calculateSubexpressions(String expression) {
-    int start = expression.indexOf("("); // find the index of open parenthesis
+    int startIdx = expression.indexOf("("); // find the index of open parenthesis
     
-    while (start != -1) {
+    while (startIdx != -1) {
       // find related close parenthesis
-      int end = findCloseParenthesis(expression, start);
+      int endIdx = findCloseParenthesis(expression, startIdx);
 
       // extract subexpression
-      String subexpression = expression.substring(start + 1, end - 1);
+      String subexpression = expression.substring(startIdx + 1, endIdx - 1);
       
       // calculate value of subexpression
       double value = calculateExpression(subexpression);
       
       // replace subexpression with value
-      expression = expression.replace(String.format("(%s)", subexpression), String.valueOf(value));
+      expression = expression.substring(0, startIdx) + String.valueOf(value) + expression.substring(endIdx);
 
       // find next subexpression
-      start = expression.indexOf("(");
+      startIdx = expression.indexOf("(");
     }
 
     return expression;
   }
-
-  static int findCloseParenthesis(String expression, int start) {
+  
+  /**
+   * Find related close parenthesis
+   * 
+   * @param expression - expression with parentheses
+   * @param startIdx - index of open parenthesis
+   * @return index of close parenthesis
+   */
+  static int findCloseParenthesis(String expression, int startIdx) {
     int length = expression.length();
     int parenthesesCount = 1;
-    int end = start + 1;
+    int endIdx = startIdx + 1;
     
-    for (; parenthesesCount != 0; end++) {
+    for (; parenthesesCount != 0; endIdx++) {
       // exit program if invalid number of parentheses
-      if (end == length) {
+      if (endIdx == length) {
         System.exit(2);
       }
       
-      if (expression.charAt(end) == '(') {
+      if (expression.charAt(endIdx) == '(') {
         parenthesesCount++;
-      } else if (expression.charAt(end) == ')') {
+      } else if (expression.charAt(endIdx) == ')') {
         parenthesesCount--;
       }
     }
 
-    return end;
+    return endIdx;
   }
 
   /**
