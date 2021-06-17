@@ -33,6 +33,46 @@ public class Calculator {
     
     expression = expression.replaceAll(" ", ""); // remove all whitespace from expression
 
+    // assume blank expression has a value of 0
+    if (expression.isBlank()) {
+      return 0;
+    }
+
+    // Calculate value of subexpression in parentheses
+    int start = expression.indexOf("("); // find the index of open parenthesis
+    
+    while (start != -1) {
+      char[] arr = expression.toCharArray(); // convert string to character array
+      int parenthesesCount = 1;
+      int end = start + 1;
+      
+      // find related close parenthesis
+      for (; parenthesesCount != 0; end++) {
+        // exit program if invalid number of parentheses
+        if (end == arr.length) {
+          System.exit(2);
+        }
+        
+        if (arr[end] == '(') {
+          parenthesesCount++;
+        } else if (arr[end] == ')') {
+          parenthesesCount--;
+        }
+      }
+
+      // extract subexpression
+      String subexpression = expression.substring(start + 1, end - 1);
+      
+      // calculate value of subexpression
+      double value = calculateExpression(subexpression);
+      
+      // replace subexpression with value
+      expression = expression.substring(0, start) + String.valueOf(value) + expression.substring(end);
+
+      // find next subexpression
+      start = expression.indexOf("(");
+    }
+
     // iterate to find operand with most precendence in expression
     for (String opp: operations) {
       if (expression.contains(opp)) {
@@ -43,7 +83,7 @@ public class Calculator {
 
     if (operation.isBlank()) { 
       // if no operand is found return value of expression
-      return expression.isBlank() ? 0 : Double.valueOf(expression);
+      return Double.valueOf(expression);
     }
     else {
       String[] operands = splitByOperation(expression, operation); // split string into the two operands of the operation
@@ -51,10 +91,6 @@ public class Calculator {
       // perform operation on operands and return result
       switch(operation) {
         case "-":
-          if (operands[0].isEmpty()) {
-            return -calculateExpression(operands[1]);
-          }
-
           return calculateExpression(operands[0]) - calculateExpression(operands[1]);
 
         case "+":

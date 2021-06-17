@@ -7,5 +7,5 @@ a mathematical expression.
 
 ## Todo
 
-- [] Implement Parentheses
+- [x] Implement Parentheses
 - [x] Account for negative numbers
