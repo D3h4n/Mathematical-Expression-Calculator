@@ -5,12 +5,20 @@ public class Calculator {
     final Scanner stdin = new Scanner(System.in); // scanner for user input
 
     // get user input
-    System.out.print("Enter an expression:(end) ");
+    System.out.print("\nEnter an expression:(end) ");
     String input = stdin.nextLine();
     
     while (!input.isBlank()) { // loop while user inputs an expression
       double result = calculateExpression(input); // calculate value of expression
-      System.out.println("Result: " + result); // output value
+
+
+
+      if (Math.floor(result) == result) {
+        System.out.println("Result: " + (int) result); // output value
+      } else {
+        System.out.println("Result: " + result); // output value
+      }
+      
     
       // get user input
       System.out.print("Enter an expression:(end) ");
