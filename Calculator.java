@@ -1,6 +1,8 @@
 import java.util.Scanner;
 
 public class Calculator {
+  static final char[] operations = {'+', '-', '*', '/', '^'}; // possible operatations in order of precedence
+
   public static void main (String[] args) {
     final Scanner stdin = new Scanner(System.in); // scanner for user input
 
@@ -34,8 +36,8 @@ public class Calculator {
    * @return value of the expression
    */
   static double calculateExpression (String expression) {
-    final char[] operations = {'+', '-', '*', '/', '^'}; // possible operatations in order of precedence 
-    char operation = '\0'; // string to store operation
+    char currentOperation = '\0'; // char to store operation
+    int operationIndex = -1;
 
     // assume blank expression has a value of 0
     if (expression.isBlank()) {
@@ -46,28 +48,33 @@ public class Calculator {
     expression = calculateSubexpressions(expression);
 
     // iterate to find operand with most precendence in expression
-    for (char opp: operations) {
-      if (expression.indexOf(opp) != -1) {
-        operation = opp;
+    for (char operation: operations) {
+      if ((operationIndex = expression.lastIndexOf(operation)) != -1) {
+        currentOperation = operation;
         break;
       }
     }
     
     // if no operand is found return value of expression
-    if (operation == '\0') {
-      return Double.valueOf(expression);
+    if (currentOperation == '\0') {
+      try {
+        return Double.valueOf(expression);
+      } catch (NumberFormatException e) {
+        System.out.println(e);
+        System.exit(1);
+      }
     }
     
     // split string into the two operands of the operation
-    String[] operands = splitByOperation(expression, operation); 
+    String[] operands = splitByOperation(expression, operationIndex); 
 
     // perform operation on operands and return result
-    switch (operation) {
-      case '-':
-        return calculateExpression(operands[0]) - calculateExpression(operands[1]);
-
+    switch (currentOperation) {
       case '+':
         return calculateExpression(operands[0]) + calculateExpression(operands[1]);
+      
+      case '-':
+        return calculateExpression(operands[0]) - calculateExpression(operands[1]);
 
       case '*':
         return calculateExpression(operands[0]) * calculateExpression(operands[1]);
@@ -79,7 +86,8 @@ public class Calculator {
         return Math.pow(calculateExpression(operands[0]),  calculateExpression(operands[1]));
     }
 
-    return Integer.MAX_VALUE;
+    // never actually reach this return
+    return -1.0;
   }
   
   /**
@@ -120,7 +128,7 @@ public class Calculator {
    * @return index of close parenthesis
    */
   static int findCloseParenthesis (String expression, int startIdx) {
-    int length = expression.length();
+    final int length = expression.length();
     int parenthesesCount = 1;
     int endIdx = startIdx + 1;
     
@@ -144,20 +152,17 @@ public class Calculator {
    * Split the operands of a binary operator 
    * 
    * @param expression - expression to separate
-   * @param operation - operation to separate by
-   * @return array of strings with separated operands
+   * @param operationIndex - index of operation in expression
+   * @return ordered pair of operands 
    */
-  static String[] splitByOperation (String expression, char operation) {
+  static String[] splitByOperation (String expression, int operationIndex) {
     String[] result = {"", ""};
-    
-    // get index of operation
-    int position = expression.lastIndexOf(operation);
 
     // split first half
-    result[0] = expression.substring(0, position);
+    result[0] = expression.substring(0, operationIndex);
     
     // split second half
-    result[1] = expression.substring(position + 1);
+    result[1] = expression.substring(operationIndex + 1);
 
     return result;
   }
