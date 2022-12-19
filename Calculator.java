@@ -61,7 +61,7 @@ public class Calculator {
         int startIdx = expression.indexOf('(');
 
         while (startIdx != -1) {
-            int endIdx = findCloseParenthesis(expression, startIdx);
+            int endIdx = findCloseParenIndex(expression, startIdx);
             String subexpression = expression.substring(startIdx + 1, endIdx - 1);
             expression = expression.substring(0, startIdx) + calculateExpression(subexpression) + expression.substring(endIdx);
             startIdx = expression.indexOf('(');
@@ -71,40 +71,13 @@ public class Calculator {
     }
 
     /**
-     * Evaluate an expression with no parentheses.
-     *
-     * @param expression without parentheses
-     * @return the value of the expression
-     */
-    private double evaluateExpression(String expression) {
-        if (expression.isBlank())
-            return 0.0;
-
-        Operator operation = null;
-        int operationIndex = -1;
-
-        for (char c : operators) {
-            if ((operationIndex = expression.lastIndexOf(c)) != -1) {
-                operation = operations.get(c);
-                break;
-            }
-        }
-
-        if (operation == null)
-            return Double.parseDouble(expression);
-
-        String[] operands = splitByOperation(expression, operationIndex);
-        return operation.eval(calculateExpression(operands[0]), calculateExpression(operands[1]));
-    }
-
-    /**
      * Find related close parenthesis
      *
      * @param expression expression with parentheses
      * @param startIdx   index of open parenthesis
      * @return index of close parenthesis
      */
-    private int findCloseParenthesis(String expression, int startIdx) {
+    private int findCloseParenIndex(String expression, int startIdx) {
         final int length = expression.length();
         int parenthesesCount = 1;
         int endIdx = startIdx + 1;
@@ -125,17 +98,46 @@ public class Calculator {
     }
 
     /**
+     * Evaluate an expression with no parentheses.
+     *
+     * @param expression without parentheses
+     * @return the value of the expression
+     */
+    private double evaluateExpression(String expression) {
+        if (expression.isBlank())
+            return 0.0;
+
+        Operator operation = null;
+        int operationIndex = -1;
+
+        for (char c : operators) {
+            operationIndex = expression.lastIndexOf(c);
+
+            if (operationIndex != -1) {
+                operation = operations.get(c);
+                break;
+            }
+        }
+
+        if (operation == null)
+            return Double.parseDouble(expression);
+
+        double[] operands = splitAndEvaluateByOperation(expression, operationIndex);
+        return operation.eval(operands);
+    }
+
+    /**
      * Split the operands of a binary operator
      *
      * @param expression     expression to separate
      * @param operationIndex index of operation in expression
      * @return ordered pair of operands
      */
-    private String[] splitByOperation(String expression, int operationIndex) {
-        String[] result = {"", ""};
+    private double[] splitAndEvaluateByOperation(String expression, int operationIndex) {
+        double[] result = {0.0, 0.0};
 
-        result[0] = expression.substring(0, operationIndex);
-        result[1] = expression.substring(operationIndex + 1);
+        result[0] = evaluateExpression(expression.substring(0, operationIndex));
+        result[1] = evaluateExpression(expression.substring(operationIndex + 1));
 
         return result;
     }
