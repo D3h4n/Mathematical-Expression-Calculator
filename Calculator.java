@@ -5,14 +5,15 @@ import java.util.Scanner;
 
 public class Calculator {
     final HashMap<Character, Operator> operations;
+    final char[] operators = {'-', '+', '/', '*', '^'}; // NOTE: ordered in reverse PEMDAS
 
     Calculator() {
         operations = new HashMap<>();
 
-        operations.put('+', new Add());
         operations.put('-', new Subtract());
-        operations.put('*', new Multiply());
+        operations.put('+', new Add());
         operations.put('/', new Divide());
+        operations.put('*', new Multiply());
         operations.put('^', new Exponent());
     }
 
@@ -82,7 +83,7 @@ public class Calculator {
         Operator operation = null;
         int operationIndex = -1;
 
-        for (char c : operations.keySet()) {
+        for (char c : operators) {
             if ((operationIndex = expression.lastIndexOf(c)) != -1) {
                 operation = operations.get(c);
                 break;
